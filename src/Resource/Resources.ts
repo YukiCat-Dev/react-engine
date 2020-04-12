@@ -25,6 +25,7 @@ export default class Resources{
     public initWithSetting(settings:Array<ResourceSetting>){
         for(const res of settings){
             this._mapSet.get(res.resType).set(res.id,{url:res.url}) 
+            
         }
     }
    private _mapSet:Map<ResourceType,Map<string,AbstractResource>>
@@ -37,7 +38,7 @@ export default class Resources{
  * @enum {number}
  */
 export enum ResourceType{
-    empty=0,Image=1,Text=2,Music=3,ReactComponent=4,
+    empty=0,Image=1,Text=2,Music=3,Video=4,ReactComponent=5,
 }
 /**
  * 指定资源的Json储存形式
@@ -59,6 +60,43 @@ export interface ResourceSetting{
  * @interface AbstractResource
  */
 export interface AbstractResource{
-    url:string,
-    
+    /**
+     * 资源的值。对于文本而言，是他本身。对于HeavyResource而言，是blobUrl
+     *
+     * @type {string}
+     * @memberof AbstractResource
+     */
+    value:string
+
+    /**
+     * 资源的URL
+     *
+     * @type {string}
+     * @memberof AbstractResource
+     */
+    url:string
+
+}
+
+
+/**
+ * 需要预载的资源。如图片、视频、音乐、ReactComponent
+ *
+ * @export
+ * @interface HeavyResource
+ * @extends {AbstractResource}
+ */
+export interface HeavyResource extends AbstractResource{
+    preload()
+    isLoaded:boolean
+}
+
+
+export class ReactComponent implements HeavyResource{
+    preload() {
+        throw new Error("Method not implemented.")
+    }
+    isLoaded: boolean
+    value: string
+
 }
