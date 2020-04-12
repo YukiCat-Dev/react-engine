@@ -1,5 +1,11 @@
 import ResIdNotFoundException from "../Exception/ResIdNotFoundException"
 
+/**
+ * 管理游戏所需的多媒体资源
+ *
+ * @export
+ * @class Resources
+ */
 export default class Resources{
     constructor(){
         let initArray=[]
@@ -18,14 +24,14 @@ export default class Resources{
     }
     public initWithSetting(settings:Array<ResourceSetting>){
         for(const res of settings){
-            ResourceType[res.resType]
+            this._mapSet.get(res.resType).set(res.id,{url:res.url}) 
         }
     }
-   private _mapSet:Map<ResourceType,Map<string,string>>
+   private _mapSet:Map<ResourceType,Map<string,AbstractResource>>
 }
 
 /**
- *不同的资源类型决定他们如何被加载、使用
+ * 指定资源的类型。不同的资源类型决定他们如何被加载、使用
  *
  * @export
  * @enum {number}
@@ -33,6 +39,12 @@ export default class Resources{
 export enum ResourceType{
     empty=0,Image=1,Text=2,Music=3,ReactComponent=4,
 }
+/**
+ * 指定资源的Json储存形式
+ *
+ * @export
+ * @interface ResourceSetting
+ */
 export interface ResourceSetting{
     id:string
     url:string
@@ -41,12 +53,12 @@ export interface ResourceSetting{
 }
 
 /**
- * 不需要知道资源的类型与id
+ * 所有细分资源类型的基类。TODO：是否不需要知道资源的类型与id
  *
  * @export
  * @interface AbstractResource
  */
 export interface AbstractResource{
     url:string,
-
+    
 }
