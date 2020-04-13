@@ -1,4 +1,4 @@
-import Audio from "../Resource/Audio"
+import Audio from "../../Resource/Audio"
 import AudioPlayer from "./AudioPlayer"
 
 export default class AudioChannel {

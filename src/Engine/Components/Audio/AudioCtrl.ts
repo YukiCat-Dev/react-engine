@@ -1,4 +1,4 @@
-import Audio, { AudioType } from "../Resource/Audio"
+import Audio, { AudioType } from "../../Resource/Audio"
 
 export default class AudioCtrl{
     constructor(){
