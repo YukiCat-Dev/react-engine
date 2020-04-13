@@ -12,10 +12,10 @@ import Video from "./Video"
 export default class Resources {
     constructor() {
         let initArray: Array<[ResourceType, Map<string, AbstractResource>]> = []
-        let workMapInitArray:Array<[ResourceType,Worker]>=[]
+        let workMapInitArray: Array<[ResourceType, Worker]> = []
         for (const type of Object.keys(ResourceType)) {
             initArray.push([ResourceType[type], new Map<string, AbstractResource>()])
-            workMapInitArray.push([ResourceType[type],new Worker('./')])//TODO:Worker
+            workMapInitArray.push([ResourceType[type], new Worker('./')])//TODO:Worker
         }
         this._mapSet = new Map(initArray)
     }
@@ -32,7 +32,7 @@ export default class Resources {
         for (const res of settings) {
             switch (res.resType) {
                 case ResourceType.Image:
-                    abRes = new Image({ url: res.url, mime: res.mime })
+                    abRes = new Image({ id: res.id, url: res.url, mime: res.mime })
                     break
                 case ResourceType.TextSet:
                     abRes = new TextsetResource(res.url, this._mapSet.get(res.resType))
@@ -41,10 +41,10 @@ export default class Resources {
                     abRes = new TextResource(res.url)//TODO:
                     break
                 case ResourceType.Music:
-                    abRes = new Audio({ url: res.url, mime: res.mime })
+                    abRes = new Audio({ id: res.id, url: res.url, mime: res.mime })
                     break
                 case ResourceType.Video:
-                    abRes = new Video({ url: res.url, mime: res.mime })
+                    abRes = new Video({ id: res.id, url: res.url, mime: res.mime })
                     break
                 case ResourceType.ReactComponent:
                 default:
@@ -57,7 +57,7 @@ export default class Resources {
         }
     }
     private _mapSet: Map<ResourceType, Map<string, AbstractResource>>
-    private _workers:Map<ResourceType,Worker>
+    private _workers: Map<ResourceType, Worker>
 }
 
 /**
@@ -80,14 +80,14 @@ export interface ResourceSetting {
     url: string
     resType: number
     mime?: string
-   
+
 }
 export interface AbstractResourceConstructor {
-    url?: string, value?: string, mime?: string, 
-   worker?:Worker
+    id: string, url?: string, value?: string, mime?: string,
+    worker?: Worker
 }
 /**
- * 所有细分资源类型的基类。TODO：是否不需要知道资源的类型与id
+ * 所有细分资源类型的基类。TODO：是否不需要知道资源的类型与id (真香)
  * @author KotoriK
  * @export
  * @abstract
@@ -103,9 +103,10 @@ export abstract class AbstractResource {
             this.value = args.value
             this.isLoaded = true
         }
-        this.mime=args.mime
-        this.worker=args.worker
+        this.mime = args.mime
+        this.worker = args.worker
     }
+    id: string=""
     /**
      * 资源的值。对于文本而言，是他本身。对于HeavyResource而言，是blob对象本身
      *
@@ -151,7 +152,7 @@ export abstract class AbstractResource {
      * @type {Worker}
      * @memberof AbstractResource
      */
-    worker?:Worker
+    worker?: Worker
 
 }
 
