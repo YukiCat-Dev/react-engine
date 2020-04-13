@@ -1,19 +1,21 @@
 import ResIdNotFoundException from "../Exception/ResIdNotFoundException"
 import Image from "./Image"
-import TextsetResource from "./TextsetResource"
-import Music from "./Music"
+import TextsetResource, { TextResource } from "./TextsetResource"
+import Audio from "./Audio"
 import Video from "./Video"
 /**
  * 管理游戏所需的多媒体资源
- *
+ * @author KotoriK
  * @export
  * @class Resources
  */
 export default class Resources {
     constructor() {
         let initArray: Array<[ResourceType, Map<string, AbstractResource>]> = []
+        let workMapInitArray:Array<[ResourceType,Worker]>=[]
         for (const type of Object.keys(ResourceType)) {
             initArray.push([ResourceType[type], new Map<string, AbstractResource>()])
+            workMapInitArray.push([ResourceType[type],new Worker('./')])//TODO:Worker
         }
         this._mapSet = new Map(initArray)
     }
@@ -25,7 +27,7 @@ export default class Resources {
             throw new ResIdNotFoundException(resId)
         }
     }
-    public initWithSetting(settings: Array<ResourceSetting>) {
+    public init(settings: Array<ResourceSetting>) {
         let abRes: AbstractResource | undefined = undefined
         for (const res of settings) {
             switch (res.resType) {
@@ -33,10 +35,13 @@ export default class Resources {
                     abRes = new Image({ url: res.url, mime: res.mime })
                     break
                 case ResourceType.TextSet:
-                    abRes = new TextsetResource({ url: res.url, textMap: this._mapSet.get(res.resType) })
+                    abRes = new TextsetResource(res.url, this._mapSet.get(res.resType))
+                    break
+                case ResourceType.Text:
+                    abRes = new TextResource(res.url)//TODO:
                     break
                 case ResourceType.Music:
-                    abRes = new Music({ url: res.url, mime: res.mime })
+                    abRes = new Audio({ url: res.url, mime: res.mime })
                     break
                 case ResourceType.Video:
                     abRes = new Video({ url: res.url, mime: res.mime })
@@ -52,6 +57,7 @@ export default class Resources {
         }
     }
     private _mapSet: Map<ResourceType, Map<string, AbstractResource>>
+    private _workers:Map<ResourceType,Worker>
 }
 
 /**
@@ -61,7 +67,7 @@ export default class Resources {
  * @enum {number}
  */
 export enum ResourceType {
-    empty = 0, Image = 1, TextSet = 2, Music = 3, Video = 4, ReactComponent = 5,
+    empty, Image, TextSet, Text, Music, Video, ReactComponent,
 }
 /**
  * 指定资源的Json储存形式
@@ -73,15 +79,16 @@ export interface ResourceSetting {
     id: string
     url: string
     resType: number
-    inresType: number
-    mime: string
+    mime?: string
+   
 }
 export interface AbstractResourceConstructor {
-    url?: string, value?: string, mime?: string
+    url?: string, value?: string, mime?: string, 
+   worker?:Worker
 }
 /**
  * 所有细分资源类型的基类。TODO：是否不需要知道资源的类型与id
- *
+ * @author KotoriK
  * @export
  * @abstract
  * @class AbstractResource
@@ -96,15 +103,17 @@ export abstract class AbstractResource {
             this.value = args.value
             this.isLoaded = true
         }
+        this.mime=args.mime
+        this.worker=args.worker
     }
     /**
-     * 资源的值。对于文本而言，是他本身。对于HeavyResource而言，是blobUrl
+     * 资源的值。对于文本而言，是他本身。对于HeavyResource而言，是blob对象本身
      *
-     * @type {string}
+     * @type {(string | Blob)}
      * @memberof AbstractResource
      */
 
-    value: string = ""
+    value: string | Blob | undefined | Object
 
     /**
      * 资源的URL
@@ -115,7 +124,7 @@ export abstract class AbstractResource {
     url: string = ""
 
     /**
-     * 开始预载资源。
+     * 将资源预载至内存。
      *
      * @memberof AbstractResource
      */
@@ -134,7 +143,15 @@ export abstract class AbstractResource {
      * @type {string}
      * @memberof AbstractResource
      */
-    mime: string = ""
+    mime?: string = ""
+
+    /**
+     * 指示执行进一步解码工作的Worker
+     *
+     * @type {Worker}
+     * @memberof AbstractResource
+     */
+    worker?:Worker
 
 }
 

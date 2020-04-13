@@ -7,10 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
+  "bugs": {"url": "https://github.com/KotoriK/react-engine/issues"},
+  "repository": {"type": "git","directory": "KotoriK/react-engine","url": "git+https://github.com/KotoriK/react-engine"},
   "license": "ISC",
   "dependencies": {
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "redux": "^4.0.5"
   },
   "devDependencies": {
     "@types/react": "^16.9.34",

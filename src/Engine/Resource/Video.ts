@@ -1,5 +1,13 @@
 import { BlobBasedHeavyResource } from "./BlobBasedHeavyResource"
 
+/**
+ * @description 视频资源
+ * @author KotoriK
+ * @date 2020-04-13
+ * @export
+ * @class Video
+ * @extends {BlobBasedHeavyResource}
+ */
 export default class Video extends BlobBasedHeavyResource {
     doDownGrade() {
         this.value = Video.downgrade
@@ -11,6 +19,6 @@ export default class Video extends BlobBasedHeavyResource {
      * @type {string}
      * @memberof Video
      */
-    static downgrade: string
+    static downgrade: Blob
 
 }

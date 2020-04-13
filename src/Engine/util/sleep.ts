@@ -1,6 +1,6 @@
 /**
  * 返回一个Promise，在指定的毫秒后resolve
- * 
+ * @author KotoriK
  * @export
  * @param {number} ms
  * @returns

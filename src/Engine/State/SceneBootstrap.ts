@@ -1,13 +1,18 @@
 import Card from "./Card";
 
 /**
- * 
+ * 自定义场景的启动模板
  *
+ * @author KotoriK
  * @export
- * @class Scene
+ * @class SceneBootstrap
  */
-export default class Scene{
+export default class SceneBootstrap{
     private _cards:Array<Card>=[]
+    addCard(card:Card){
+        this._cards.push(card)
+        return this
+    }
     jumpNext(){
 
     }
@@ -35,5 +40,5 @@ export default class Scene{
     showComponent(){
 
     }
+    
 }
-

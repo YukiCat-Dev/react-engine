@@ -1,9 +1,15 @@
-/** 资源加载支持。*/
 const regHTTPURL = /^https?/i
 const RETRY_TIME = 5
 const retryAfterMs = 1000
 import sleep from '../util/sleep'
 
+/**
+ * @description 资源加载支持。
+ * @author KotoriK
+ * @date 2020-04-13
+ * @export
+ * @class ResourceLoader
+ */
 export default class ResourceLoader {
     /**
      * 根据所给的URL（网络资源或本地资源）获取资源并返回。
