@@ -15,7 +15,7 @@ export default class Engine {
         this.ResourcesSet.init(resSetting)
     }
     playMusic(resId: string, asType: AudioType) {
-        let music = this.ResourcesSet.get(ResourceType.Music, resId)
+        let music = this.ResourcesSet.get(ResourceType.MUSIC, resId)
         if (music && music.isLoaded) {
 
         } else {

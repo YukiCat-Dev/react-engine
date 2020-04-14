@@ -10,14 +10,18 @@ import Video from "./Video"
  * @class Resources
  */
 export default class Resources {
-    constructor() {
+    constructor(options: ResourcesOptions) {
         let initArray: Array<[ResourceType, Map<string, AbstractResource>]> = []
-        let workMapInitArray: Array<[ResourceType, Worker]> = []
+        let workMapInitArray: Array<[ResourceType, Worker]> =[]
+        for(const type of options.decodeWorker){
+            workMapInitArray.push([ResourceType[type[0]],new Worker(type[1])])//TODO:importer
+        }
         for (const type of Object.keys(ResourceType)) {
             initArray.push([ResourceType[type], new Map<string, AbstractResource>()])
-            workMapInitArray.push([ResourceType[type], new Worker('./')])//TODO:Worker
         }
+
         this._mapSet = new Map(initArray)
+        this._workers=new Map(workMapInitArray)
     }
     public get(resType: ResourceType, resId: string) {
         let res = this._mapSet.get(resType).get(resId)
@@ -31,22 +35,25 @@ export default class Resources {
         let abRes: AbstractResource | undefined = undefined
         for (const res of settings) {
             switch (res.resType) {
-                case ResourceType.Image:
+                case ResourceType.IMAGE:
                     abRes = new Image({ id: res.id, url: res.url, mime: res.mime })
                     break
-                case ResourceType.TextSet:
+                case ResourceType.TEXT_SET:
                     abRes = new TextsetResource(res.url, this._mapSet.get(res.resType))
                     break
-                case ResourceType.Text:
+                case ResourceType.TEXT:
                     abRes = new TextResource(res.url)//TODO:
                     break
-                case ResourceType.Music:
+                case ResourceType.MUSIC:
                     abRes = new Audio({ id: res.id, url: res.url, mime: res.mime })
                     break
-                case ResourceType.Video:
+                case ResourceType.VIDEO:
                     abRes = new Video({ id: res.id, url: res.url, mime: res.mime })
                     break
-                case ResourceType.ReactComponent:
+                case ResourceType.REACT_COMPONENT:
+                    break
+                case ResourceType.SCRIPT:
+                    break
                 default:
 
             }
@@ -67,7 +74,7 @@ export default class Resources {
  * @enum {number}
  */
 export enum ResourceType {
-    empty, Image, TextSet, Text, Music, Video, ReactComponent,
+    EMPTY, IMAGE, TEXT_SET, TEXT, MUSIC, VIDEO, REACT_COMPONENT, SCRIPT
 }
 /**
  * 指定资源的Json储存形式
@@ -106,7 +113,7 @@ export abstract class AbstractResource {
         this.mime = args.mime
         this.worker = args.worker
     }
-    id: string=""
+    id: string = ""
     /**
      * 资源的值。对于文本而言，是他本身。对于HeavyResource而言，是blob对象本身
      *
@@ -156,7 +163,9 @@ export abstract class AbstractResource {
 
 }
 
-
+export interface ResourcesOptions {
+    decodeWorker: Array<[string, string]>//    "decodeWorker":[["audio","../src/Engine/Components/Audio/AudioDecodeWorker.ts"]]
+}
 
 
 export class ReactComponent extends AbstractResource {
