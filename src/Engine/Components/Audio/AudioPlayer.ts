@@ -6,6 +6,7 @@ import AudioEffects from "./AudioEffects"
  * @date 2020-04-13
  * @export
  * @class AudioPlayer
+ * @deprecated
  */
 export default class AudioPlayer //TODO:extends EventTarget 
 {
