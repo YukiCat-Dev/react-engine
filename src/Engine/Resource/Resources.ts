@@ -24,7 +24,7 @@ export default class Resources {
         this._workers=new Map(workMapInitArray)
     }
     public get(resType: ResourceType, resId: string) {
-        let res = this._mapSet.get(resType).get(resId)
+        let res = this._mapSet.get(resType)?.get(resId)
         if (res) {
             return res
         } else {
@@ -39,13 +39,15 @@ export default class Resources {
                     abRes = new Image({ id: res.id, url: res.url, mime: res.mime })
                     break
                 case ResourceType.TEXT_SET:
-                    abRes = new TextsetResource(res.url, this._mapSet.get(res.resType))
+                    let map=this._mapSet.get(res.resType)
+                    if(!map)throw new Error()//TODO:UnknownException
+                    abRes = new TextsetResource(res.url, map)
                     break
                 case ResourceType.TEXT:
                     abRes = new TextResource(res.url)//TODO:
                     break
                 case ResourceType.MUSIC:
-                    abRes = new Audio({ id: res.id, url: res.url, mime: res.mime })
+                    abRes = new Audio({ id: res.id, url: res.url, mime: res.mime,worker:this._workers.get(res.resType), })
                     break
                 case ResourceType.VIDEO:
                     abRes = new Video({ id: res.id, url: res.url, mime: res.mime })
@@ -58,7 +60,7 @@ export default class Resources {
 
             }
             if (abRes) {//TODO:DELETE
-                this._mapSet.get(res.resType).set(res.id, abRes)
+                this._mapSet.get(res.resType)?.set(res.id, abRes)
             }
 
         }
@@ -94,7 +96,7 @@ export interface AbstractResourceConstructor {
     worker?: Worker
 }
 /**
- * 所有细分资源类型的基类。TODO：是否不需要知道资源的类型与id (真香)
+ * 所有细分资源类型的基类。
  * @author KotoriK
  * @export
  * @abstract
@@ -113,6 +115,12 @@ export abstract class AbstractResource {
         this.mime = args.mime
         this.worker = args.worker
     }
+    /**
+     * resId
+     *
+     * @type {string}
+     * @memberof AbstractResource
+     */
     id: string = ""
     /**
      * 资源的值。对于文本而言，是他本身。对于HeavyResource而言，是blob对象本身
@@ -172,6 +180,4 @@ export class ReactComponent extends AbstractResource {
     preload() {
         throw new Error("Method not implemented.")
     }
-
-
 }

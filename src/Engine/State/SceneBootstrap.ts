@@ -1,4 +1,6 @@
 import Card from "./Card";
+import Scene from "./Scene";
+import SceneAction from "./SceneAction";
 
 /**
  * 自定义场景的启动模板
@@ -7,8 +9,9 @@ import Card from "./Card";
  * @export
  * @class SceneBootstrap
  */
-export default class SceneBootstrap{
+export default class SceneBootstrap extends Scene{
     private _cards:Array<Card>=[]
+    private _cardAction:Array<SceneAction>=[]
     addCard(card:Card){
         this._cards.push(card)
         return this
@@ -41,4 +44,7 @@ export default class SceneBootstrap{
 
     }
     
+}
+export enum GainChangeType{
+    linear,exp,directly
 }
