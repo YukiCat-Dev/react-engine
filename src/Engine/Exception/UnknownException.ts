@@ -1,0 +1,1 @@
+export default class UnknownException extends Error{}

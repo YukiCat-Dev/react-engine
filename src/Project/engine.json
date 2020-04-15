@@ -1,5 +1,16 @@
-{
-    "resourceSettingPath":"string",
-    "player.latencyHint":"balanced"
-
+{   
+    "projectPath":"",
+    "resources":{
+        "decodeWorker":[["Audio","../src/Engine/Components/Audio/AudioDecodeWorker.ts"],["Video",""]]
+        
+        
+    },"AudioControl":{
+        "traces":[{"name":"bgm"},{"name":"bgs"},{"name":"cv"},{"name":"ss"}],
+        "mainMixerOption":{
+            "ctxOptions":{
+                "latencyHint":"balanced",
+                "sampleRate":"44100"
+            }
+        }
+    }
 }

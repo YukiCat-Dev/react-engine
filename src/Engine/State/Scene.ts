@@ -1,4 +1,5 @@
 import Card from "./Card";
+import { AbstractResource } from "../Resource/Resources";
 
 /**
  * 
@@ -8,6 +9,7 @@ import Card from "./Card";
  */
 export default class Scene{
     private _cards:Array<Card>=[]
+    private _res:Map<string,AbstractResource>
     jumpNext(){
 
     }
