@@ -1,15 +1,13 @@
-import Scene from "./Scene";
-import SceneAction from "./SceneAction";
+import {SceneAction} from "./SceneAction";
+import CardProcessor from "./CardProcessor";
 
 export default abstract class Card {
-    constructor(scene:Scene){
-        this.scene=scene
+    constructor(run:(Scene:CardProcessor)=>void){
+      this.run=run
     }
-    public scene:Scene
-    abstract run()
+ run:(Scene:CardProcessor)=>void
 
 }
-export class ProcessedCard{
+export interface ProcessedCard{
     actions:Array<SceneAction>
-    a:Queue
 }
