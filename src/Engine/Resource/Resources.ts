@@ -11,25 +11,31 @@ import Video from "./Video"
  */
 export default class Resources {
     constructor(options: ResourcesOptions) {
-        let initArray: Array<[ResourceType, Map<string, AbstractResource>]> = []
-        let workMapInitArray: Array<[ResourceType, Worker]> =[]
-        for(const type of options.decodeWorker){
-            workMapInitArray.push([ResourceType[type[0]],new Worker(type[1])])//TODO:importer
-        }
-        for (const type of Object.keys(ResourceType)) {
-            initArray.push([ResourceType[type], new Map<string, AbstractResource>()])
+        let workMapInitArray: Array<[ResourceType, Worker]> = []
+        for (const type of options.decodeWorker) {
+            workMapInitArray.push([ResourceType[type[0]], new Worker(type[1])])//TODO:importer
         }
 
-        this._mapSet = new Map(initArray)
-        this._workers=new Map(workMapInitArray)
+        this._workers = new Map(workMapInitArray)
     }
-    public get(resType: ResourceType, resId: string) {
-        let res = this._mapSet.get(resType)?.get(resId)
+    /**
+     * 得到resId对应的资源。注意resId应唯一且不能重名。
+     *
+     * @author KotoriK
+     * @param {string} resId
+     * @returns
+     * @memberof Resources
+     */
+    public get(resId: string) {
+        let res = this._mapSet.get(resId)
         if (res) {
             return res
         } else {
             throw new ResIdNotFoundException(resId)
         }
+    }
+    public getText(resId: string) {
+        return this.get(`TS_${resId}`)
     }
     public init(settings: Array<ResourceSetting>) {
         let abRes: AbstractResource | undefined = undefined
@@ -39,15 +45,13 @@ export default class Resources {
                     abRes = new Image({ id: res.id, url: res.url, mime: res.mime })
                     break
                 case ResourceType.TEXT_SET:
-                    let map=this._mapSet.get(res.resType)
-                    if(!map)throw new Error()//TODO:UnknownException
-                    abRes = new TextsetResource(res.url, map)
+                    abRes = new TextsetResource({ id: res.id, url: res.url }, this._mapSet)
                     break
                 case ResourceType.TEXT:
-                    abRes = new TextResource(res.url)//TODO:
+                    abRes = new TextResource({ id: res.id, value: res.value ? res.value : '' })
                     break
-                case ResourceType.MUSIC:
-                    abRes = new Audio({ id: res.id, url: res.url, mime: res.mime,worker:this._workers.get(res.resType), })
+                case ResourceType.AUDIO:
+                    abRes = new Audio({ id: res.id, url: res.url, mime: res.mime, worker: this._workers.get(res.resType), })
                     break
                 case ResourceType.VIDEO:
                     abRes = new Video({ id: res.id, url: res.url, mime: res.mime })
@@ -59,13 +63,16 @@ export default class Resources {
                 default:
 
             }
-            if (abRes) {//TODO:DELETE
-                this._mapSet.get(res.resType)?.set(res.id, abRes)
+            if (abRes) {
+                this._mapSet.set(res.id, abRes)
             }
 
         }
     }
-    private _mapSet: Map<ResourceType, Map<string, AbstractResource>>
+    public remove(resId: string) {
+        return this._mapSet.delete(resId)
+    }
+    private _mapSet: Map<string, AbstractResource> = new Map()
     private _workers: Map<ResourceType, Worker>
 }
 
@@ -76,7 +83,7 @@ export default class Resources {
  * @enum {number}
  */
 export enum ResourceType {
-    EMPTY, IMAGE, TEXT_SET, TEXT, MUSIC, VIDEO, REACT_COMPONENT, SCRIPT
+    EMPTY, IMAGE, TEXT_SET, TEXT, AUDIO, VIDEO, REACT_COMPONENT, SCRIPT
 }
 /**
  * 指定资源的Json储存形式
@@ -89,6 +96,13 @@ export interface ResourceSetting {
     url: string
     resType: number
     mime?: string
+    /**
+     * 仅Text类型直接带value
+     *
+     * @type {string}
+     * @memberof ResourceSetting
+     */
+    value?: string
 
 }
 export interface AbstractResourceConstructor {
@@ -103,7 +117,6 @@ export interface AbstractResourceConstructor {
  * @class AbstractResource
  */
 export abstract class AbstractResource {
-
     constructor(args: AbstractResourceConstructor) {
         if (args.url) {
             this.url = args.url
@@ -145,6 +158,10 @@ export abstract class AbstractResource {
      * @memberof AbstractResource
      */
     abstract preload()
+    unload() {
+        this.value = undefined
+        this.isLoaded = false
+    }
     /**
      *
      * 指示是否已经加载。
@@ -181,3 +198,5 @@ export class ReactComponent extends AbstractResource {
         throw new Error("Method not implemented.")
     }
 }
+
+export type MarkedAbstractResource=[boolean,AbstractResource]

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "parcel src/index.html",
-    "tsc":"tsc src\\Engine\\util\\LinkedList.ts"
+    "tsc":"tsc src\\Engine\\util\\CircularLinkedList.ts src\\Engine\\util\\SingleWayLinkedList"
   },
   "author": "",
   "bugs": {
@@ -16,7 +16,7 @@
     "directory": "KotoriK/react-engine",
     "url": "git+https://github.com/KotoriK/react-engine"
   },
-  "license": "ISC",
+  "license": "GNU GPLv3",
   "dependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

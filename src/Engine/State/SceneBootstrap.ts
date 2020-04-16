@@ -1,7 +1,8 @@
-import Card from "./Card";
+import Card, { ProcessedCard } from "./Card";
 import Scene from "./Scene";
-import SceneAction from "./SceneAction";
-
+import {  MarkedAbstractResource } from "../Resource/Resources";
+import Engine from "../Engine";
+import CardProcessor from "./CardProcessor";
 /**
  * 自定义场景的启动模板
  *
@@ -9,42 +10,37 @@ import SceneAction from "./SceneAction";
  * @export
  * @class SceneBootstrap
  */
-export default class SceneBootstrap extends Scene{
-    private _cards:Array<Card>=[]
-    private _cardAction:Array<SceneAction>=[]
-    addCard(card:Card){
-        this._cards.push(card)
+export default class SceneBootstrap {
+    constructor(engine:Engine,cards?: Array<ProcessedCard>) {
+        this.engine=engine
+        this._cards = cards ? cards : []
+    }
+    public readonly engine:Engine
+    private _cards: Array<ProcessedCard>
+    public res:Map<string,MarkedAbstractResource>=new Map()
+    /**
+     * 向场景添加Card
+     *
+     * @author KotoriK
+     * @param {Card} card
+     * @returns
+     * @memberof SceneBootstrap
+     */
+    addCard(card: Card) {
+       
+        this._cards.push(new CardProcessor(card,this)._build())
+
         return this
     }
-    jumpNext(){
-
-    }
-    jumpToEnd(){
-
-    }
-    jumpToStart(){
-
-    }
-    jumpTo(card:Card){
-
-    }
-    playBGS(resId:string){
-
-    }
-    playBGM(resId:string){
-
-    }
-    playCV(resId:string){
-
-    }
-    setBackground(resId:string){
-
-    }
-    showComponent(){
-
-    }
     
-}
-export enum GainChangeType{
-    linear,exp,directly
+    /**
+     * 生成场景。
+     *
+     * @author KotoriK
+     * @returns
+     * @memberof SceneBootstrap
+     */
+    build(){//TODO:
+        return new Scene(this._cards,this.res,this.engine)
+    }
 }

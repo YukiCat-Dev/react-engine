@@ -1,14 +1,22 @@
-import LinkedList from "../LinkedList";
-
+import SingleWayLinkedList from "../SingleWayLinkedList";
+import CircularLinkedList from '../CircularLinkedList'
 function test(times){
-    var q=new LinkedList()
+    var q=new SingleWayLinkedList()
     var a=[]
+    var c=new CircularLinkedList()
+
 //push
-    console.time('queue push')
+    console.time('single-link push')
     for(let i=0;i<times;i++){
         q.push(i)
     }
-    console.timeEnd('queue push')
+    console.timeEnd('single-link push')
+
+    console.time('circular push')
+    for(let i=0;i<times;i++){
+        c.push(i)
+    }
+    console.timeEnd('circular push')
 
     console.time('array push')
     for(let i=0;i<times;i++){
@@ -16,11 +24,17 @@ function test(times){
     }
     console.timeEnd('array push')
 //shift
-    console.time('queue shift')
+    console.time('single-link shift')
     for(let i=0;i<times;i++){
         q.shift()
     }
-    console.timeEnd('queue shift')
+    console.timeEnd('single-link shift')
+
+    console.time('circular shift')
+    for(let i=0;i<times;i++){
+        c.shift()
+    }
+    console.timeEnd('circular shift')
 
     console.time('array shift')
     for(let i=0;i<times;i++){
@@ -28,11 +42,17 @@ function test(times){
     }
     console.timeEnd('array shift')
     //unshift
-    console.time('queue unshift')
+    console.time('single-link unshift')
     for(let i=0;i<times;i++){
         q.unshift(i)
     }
-    console.timeEnd('queue unshift')
+    console.timeEnd('single-link unshift')
+
+    console.time('circular unshift')
+    for(let i=0;i<times;i++){
+        c.unshift(i)
+    }
+    console.timeEnd('circular unshift')
 
     console.time('array unshift')
     for(let i=0;i<times;i++){
@@ -40,11 +60,17 @@ function test(times){
     }
     console.timeEnd('array unshift')
 //delete
-console.time('queue delete')
+console.time('single-link delete')
     for(let i=0;i<times;i++){
-        q.delete(i)
+        q.remove(i)
     }
-    console.timeEnd('queue delete')
+    console.timeEnd('single-link delete')
+
+  /*   console.time('single-link delete')
+    for(let i=0;i<times;i++){
+        c.delete(i)
+    }
+    console.timeEnd('single-link delete') */
 
     console.time('array splice')
     for(let i=0;i<times;i++){

@@ -4,22 +4,22 @@ export default class AudioControl{
     constructor(options:AudioControlOptions){
         this.mainMixer=new Mixer(options.mainMixerOption)
         let initArray:Array<[string,Mixer]>=[]
-        for(const trace of options.traces){
-            initArray.push([trace.name,
-                new Mixer(trace.mixerOption?trace.mixerOption:options.mainMixerOption)])
+        for(const track of options.tracks){
+            initArray.push([track.name,
+                new Mixer(track.mixerOption?track.mixerOption:options.mainMixerOption)])
         }
-        this.traceMap=new Map(initArray)
+        this.trackMap=new Map(initArray)
     }
     mainMixer:Mixer
-    traceMap:Map<string,Mixer>
+    trackMap:Map<string,Mixer>
     
 
 }
 export interface AudioControlOptions{
     mainMixerOption?:MixerOptions
-    traces:Array<Trace>
+    tracks:Array<Track>
 }
-export interface Trace{
+export interface Track{
     name:string,
     mixerOption?:MixerOptions
 }
