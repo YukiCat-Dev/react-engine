@@ -10,6 +10,7 @@ export enum GainChangeType {
 export enum SceneActionType {
     au_play_source, au_clear_all_source, au_remove_source, au_mute_track, au_resume_track, au_gain_change,
     au_mute_all, au_resume_all,
+    react_show,
     bg_change,
     jump_to,
     _if, _switch,_wait,_interval

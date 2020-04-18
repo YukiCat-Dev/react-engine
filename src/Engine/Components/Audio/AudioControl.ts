@@ -12,12 +12,12 @@ export default class AudioControl{
     }
     mainMixer:Mixer
     trackMap:Map<string,Mixer>
-    
 
 }
 export interface AudioControlOptions{
     mainMixerOption?:MixerOptions
     tracks:Array<Track>
+    
 }
 export interface Track{
     name:string,
