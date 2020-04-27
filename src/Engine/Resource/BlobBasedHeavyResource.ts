@@ -25,12 +25,12 @@ export abstract class BlobBasedHeavyResource extends AbstractResource {
      * @type {(Blob|undefined|Object)}
      * @memberof BlobBasedHeavyResource
      */
-    protected _value: Blob | undefined | Object
+    protected _value: Blob | undefined | Object | AudioBuffer
     public get value() {
         return this._value
     }
     /**@todo 不需要自动创建valueUrl时应当重写setter */
-    public set value(newValue: Blob | undefined | Object) {
+    public set value(newValue: Blob | undefined | Object| AudioBuffer) {
         if (this._valueUrl) {
             URL.revokeObjectURL(this._valueUrl)
         }

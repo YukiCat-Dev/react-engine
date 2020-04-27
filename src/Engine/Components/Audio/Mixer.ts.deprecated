@@ -1,15 +1,14 @@
-import { AudioSource, SourceNodeLoopOptions, StartOptions } from "./AudioSource";
+import  {AudioSource ,SourceNodeLoopOptions } from "./AudioSource"
 
-export default class Mixer{
-    constructor(options:MixerProps){
-        this._sourcesMap=options.sourceMap
-        this._actionDelete=options.actionDelete
-        this.ctx = new AudioContext(options.ctxOptions)
+export default class Mixer extends EventTarget {
+    constructor(options?: MixerOptions) {
+        super()
+        this.ctx = new AudioContext(options?.ctxOptions)
         this.mainGain = this.ctx.createGain()
-        if(options.defaultMainGainValue){
+        if(options?.defaultMainGainValue){
             this.mainGain.gain.setValueAtTime(options.defaultMainGainValue,this.ctx.currentTime)//初始化主增益节点音量
         }
-        if (options.dynamicCompressorOptions) {
+        if (options?.dynamicCompressorOptions) {
             this.dynamicCompressor = this.ctx.createDynamicsCompressor()
 
             options.dynamicCompressorOptions.knee ?
@@ -25,7 +24,16 @@ export default class Mixer{
             this.mainGain.connect(this.ctx.destination)
         }
     }
-    private _actionDelete:(id:string)=>any
+    //TODO:finish event system
+    addEventListener(type: "play" | "pause", listener: EventListener | EventListenerObject | null, options?: boolean | AddEventListenerOptions | undefined): void {
+        super.addEventListener(type, listener, options)
+    }
+    dispatchEvent(event: Event): boolean {
+        return super.dispatchEvent(event)
+    }
+    removeEventListener(type: string, callback: EventListener | EventListenerObject | null, options?: boolean | EventListenerOptions | undefined): void {
+        super.removeEventListener(type, callback, options)
+    }
     ctx: AudioContext
     /**
      * 主增益控制节点，总是连在ctx.destination或dynamicCompressor上（若有）
@@ -48,25 +56,7 @@ export default class Mixer{
      * @type {(Map<string, AudioSource>)}
      * @memberof Mixer
      */
-    /**
-     * 索引srcId与对应的SourceNode的地图。从上级组件获取
-     *
-     * @private
-     * @type {(Map<string, AudioSource>)}
-     * @memberof Mixer
-     */
-    private _sourcesMap:Map<string,AudioSource>
-    /**
-     * 根据所给的AudioBuffer创建一个AudioSource
-     *
-     * @author KotoriK
-     * @param {string} id
-     * @param {AudioBuffer} buf
-     * @memberof Mixer
-     */
-    createSource(buf: AudioBuffer): AudioSource {
-        return new AudioSource(buf,this.ctx)
-    }
+    private _sourcesMap: Map<string, AudioSource> = new Map()
     /**
      * 保存需要加入到ctx的AudioNode，仅仅是帮助你管理这些资源而已。source会自动连接到Array中最后一个节点（按传入顺序）
      *
@@ -106,6 +96,51 @@ export default class Mixer{
         node.connect(nodeLast)
         return nodeLast
     }
+    /**
+     * 根据所给的AudioBuffer创建一个AudioSource
+     *
+     * @author KotoriK
+     * @param {string} id
+     * @param {AudioBuffer} buf
+     * @memberof Mixer
+     */
+    createSource(buf: AudioBuffer): AudioSource {
+        return new AudioSource(buf,this.ctx)
+    }
+    hasSource(id: string) {
+        return this._sourcesMap.has(id)
+    }
+    /**
+     * 添加一个音源。
+     *
+     * @author KotoriK
+     * @param {string} id
+     * @param {AudioSource} node
+     * @param {boolean} [autoConnect=false] 如果你选择自动连接的话，所有传入节点会自动连接到最后一个节点（调用connectToLast()）
+     * @memberof Mixer
+     */
+    addSource(id: string, node: AudioSource,autoConnect:boolean=false) {
+        if(autoConnect)this.connectToLast(node)
+        this._sourcesMap.set(id, node)
+        node.on('ended', () => { this._sourcesMap.delete(id) }) //自毁，毕竟播完就没用了
+        return this
+    }
+    /**
+     * 删除指定的ArrayBuffer对应的AudioSource
+     *
+     * @author KotoriK
+     * @param {AudioBuffer} buf
+     * @returns {boolean} 是否删除成功
+     * @memberof Mixer
+     */
+    removeSource(id: string): boolean {
+        if (this._sourcesMap.has(id)) {
+            this._sourcesMap.delete(id)
+            return true
+        } else {
+            return false
+        }
+    }
     pauseAll() {
         this.ctx.suspend()
     }
@@ -113,7 +148,8 @@ export default class Mixer{
         this.ctx.resume()
     }
     /**
-     * 播放指定的source
+     *
+     *
      * @author KotoriK
      * @param {string} id
      * @param {SourceNodeLoopOptions} [loop] 循环选项。不想循环就不要传参数
@@ -121,11 +157,10 @@ export default class Mixer{
      * @returns
      * @memberof Mixer
      */
-    play(id: string, startOption?:StartOptions) {
+    play(id: string, when?: number, loop?: SourceNodeLoopOptions) {
         let node = this._sourcesMap.get(id)
         if (node) {
-            node.on('ended', () => { this._actionDelete(id) }) //自毁，毕竟播完就没用了
-            node.start(startOption)
+            node.start(when,loop)
             return true
         } else {
             return false
@@ -142,7 +177,7 @@ export default class Mixer{
     }
     playAll(loop?: SourceNodeLoopOptions) {
         for (const node of this._sourcesMap.values()) {
-            node.start({loop})
+            node.start(0,loop)
 
         }
         return this
@@ -153,16 +188,15 @@ export default class Mixer{
         }
         return this
     }
-    close(){
-        return this.ctx.close()
+    getGainOf(id:string){
+        return this._sourcesMap.get(id)?.gain
     }
-}
-export interface MixerProps extends MixerUserOptions{
-    sourceMap:Map<string,AudioSource>
-    actionDelete:(id:string)=>any
-}
+    private _initPlayEvent(){
+        this.dispatchEvent(new Event('play',{bubbles:true}))
+    }
 
-export interface MixerUserOptions{
+}
+export interface MixerOptions {
     defaultMainGainValue?:number
     ctxOptions?: AudioContextOptions | undefined
     dynamicCompressorOptions?: DynamicsCompressorOptions | undefined
