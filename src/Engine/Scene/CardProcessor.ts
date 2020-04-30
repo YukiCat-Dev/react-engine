@@ -27,9 +27,9 @@ export default class CardProcessor{
         this._nowCardAction.push({ type: SceneActionType.jump_to, value: index })
         return this
     }
-    playAudio(resId: string,onTrack:string) {
+    playAudio(resId: string,trackId:string) {
         this._prepareResource(resId)
-        this._nowCardAction.push({type:SceneActionType.au_play_source,track:onTrack,resId:resId})
+        this._nowCardAction.push({type:SceneActionType.au_play_source,trackId,resId})
         return this
     }
    
