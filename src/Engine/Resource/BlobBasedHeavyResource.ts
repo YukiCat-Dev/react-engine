@@ -1,4 +1,4 @@
-import { AbstractResource } from "./Resources"
+import { AbstractResource } from "./ResourceControl"
 import ResourceLoader from "./ResLoader"
 
 /**

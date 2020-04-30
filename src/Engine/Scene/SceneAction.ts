@@ -1,9 +1,9 @@
-import { ReactComponent } from "../Resource/Resources";
-import { TriParamColor } from "../Components/UI/ui";
+import { ReactComponent } from "../Resource/ResourceControl";
+import { TriParamColor } from "../UI/color";
 import Image from '../Resource/Image'
 import Video from '../Resource/Video'
 import { Time } from "../util/time";
-import { StartOptions } from "~Engine/Components/Audio/AudioSource";
+import { StartOptions } from "~Engine/Audio/AudioSource";
 
 export enum GainChangeType {
     linear, exp, directly

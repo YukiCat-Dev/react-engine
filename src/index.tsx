@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */}
 import Engine from "./Engine/Engine";
 import React from "react";
 import ReactDom from 'react-dom'
-import LoadingScreen from './Engine/Components/UI/LoadingScreen'
+import LoadingScreen from './Engine/UI/LoadingScreen'
 //load screen
 function Game() {
     return (<div >

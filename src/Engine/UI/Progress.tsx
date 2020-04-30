@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TriParamColor, ColorUtil } from './ui';
+import { TriParamColor, ColorUtil } from './color';
 import './progress.css'
 export interface ProgressProps {
     color?: TriParamColor//TODO:实现

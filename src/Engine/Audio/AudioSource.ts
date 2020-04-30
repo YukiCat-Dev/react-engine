@@ -19,31 +19,60 @@ export class AudioSource {
      * @memberof AudioSource
      */
     constructor(buf: AudioBuffer, ctx: AudioContext, defaultGainValue?: number) {
-        this._source = ctx.createBufferSource()
-        this._source.buffer = buf
+        this.buf = buf
+        this.initSource()
         this._gain = ctx.createGain()
-        this._source.connect(this._gain)
         if (defaultGainValue) {
             this.defaultGainValue = defaultGainValue
             this._gain.gain.setValueAtTime(defaultGainValue, 0)
         } else {
             this.defaultGainValue = this._gain.gain.defaultValue
         }
-        this.on('ended', () => { this._state = 'stop' })
+
         this._ctx = ctx
-        this._state = "ready"
     }
     public readonly defaultGainValue: number
-    private _state: 'play' | 'stop' | 'ready'
+    private _state!: 'play' | 'stop' | 'ready'//已在initSource()初始化
     public get state() {
         return this._state
     }
+    public buf: AudioBuffer
     private _ctx: AudioContext
-    private _source: AudioBufferSourceNode
+    private _source!: AudioBufferSourceNode//已在initSource()初始化
     private _gain: GainNode
     public get gain() {
         return this._gain.gain
     }
+    /**
+     * 初始化AudioBufferSourceNode，亦可于用于
+     *
+     * @author KotoriK
+     * @memberof AudioSource
+     */
+    initSource() {
+        //TODO:是否需要对旧节点的处理？
+        this._source = ctx.createBufferSource()
+        this._source.buffer = this.buf
+        this._source.connect(this._gain)
+        this.on('ended', () => { this._state = 'stop' })
+        this._state = "ready"
+    }
+    /**
+     * 还原增益值为初始增益值
+     *
+     * @author KotoriK
+     * @memberof AudioSource
+     */
+    setGainDefault() {
+        this.gain.setValueAtTime(this.defaultGainValue, this._ctx.currentTime)
+    }
+    /**
+     * 连接到指定的AudioNode
+     *
+     * @author KotoriK
+     * @param {AudioNode} node
+     * @memberof AudioSource
+     */
     connect(node: AudioNode) {
         this._gain.connect(node)
     }
@@ -57,7 +86,7 @@ export class AudioSource {
             if (options.fade) {
                 if (options.when) {
                     sleep(Times.convert({ value: options.when, unit: TimeUnit.Second }, TimeUnit.Microsecond).value).then(() => {
-                        AudioEffects.fade(this._gain.gain, Object.assign(options.fade,{targetValue:this.defaultGainValue}))//TODO:为什么同样的语法，检查过不去?????????
+                        AudioEffects.fade(this._gain.gain, Object.assign(options.fade, { targetValue: this.defaultGainValue }))//TODO:为什么同样的语法，检查过不去?????????
                         this._start()
                     })
                 } else {
@@ -70,7 +99,6 @@ export class AudioSource {
             return
         }
         this._start()
-
     }
     private _start(when?: number) {
         try {
@@ -88,7 +116,7 @@ export class AudioSource {
      * @param {number} [when] 在从现在开始算多久之后停止
      * @memberof AudioSource
      */
-    stop( when?: number,fade_out?: FadeOption) {
+    stop(when?: number, fade_out?: FadeOption) {
         if (fade_out) {
             if (when) {
                 sleep(Times.convert({ value: when, unit: TimeUnit.Second }, TimeUnit.Microsecond).value).then(() => {
@@ -104,7 +132,7 @@ export class AudioSource {
         }
     }
     /**
-     * 在BufferSourceNode触发onended时触发，应当设置监听在此时取消对本对象的引用
+     * 在BufferSourceNode触发onended时触发
      *
      * @author KotoriK
      * @param {'ended'} type
@@ -114,7 +142,6 @@ export class AudioSource {
     on(type: 'ended', listener: Function) {
         this._source.addEventListener('ended', listener())
     }
-
 }
 
 export interface SourceNodeLoopOptions {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TriParamColor } from './ui';
+import { TriParamColor } from './color';
 import Background, { BackgroundType } from './Background';
 import Progress from './Progress';
 export interface LoadingScreenProps {

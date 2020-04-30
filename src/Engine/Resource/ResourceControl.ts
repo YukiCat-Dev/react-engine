@@ -9,7 +9,7 @@ import Video from "./Video"
  * @export
  * @class Resources
  */
-export default class Resources {
+export default class ResourceControl {
     constructor(options: ResourcesOptions) {
         let workMapInitArray: Array<[ResourceType, Worker]> = []
         for (const type of options.decodeWorker) {

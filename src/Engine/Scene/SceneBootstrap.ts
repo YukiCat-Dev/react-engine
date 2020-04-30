@@ -1,6 +1,6 @@
 import Card, { ProcessedCard } from "./Card";
 import Scene from "./Scene";
-import {  MarkedAbstractResource } from "../Resource/Resources";
+import {  MarkedAbstractResource } from "../Resource/ResourceControl";
 import Engine from "../Engine";
 import CardProcessor from "./CardProcessor";
 /**

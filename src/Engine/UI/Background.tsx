@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { RGBColor, TriParamColor, ColorUtil } from './ui';
-import Video from '../../Resource/Video';
-import Image from '../../Resource/Image';
+import { RGBColor, TriParamColor, ColorUtil } from './color';
+import Video from '../Resource/Video';
+import Image from '../Resource/Image';
 
 /**
  * 

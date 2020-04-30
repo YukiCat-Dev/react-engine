@@ -1,8 +1,7 @@
 import  {AudioSource ,SourceNodeLoopOptions } from "./AudioSource"
 
-export default class Mixer extends EventTarget {
-    constructor(options?: MixerOptions) {
-        super()
+export default class Mixer {
+    constructor(options?: MixerProps) {
         this.ctx = new AudioContext(options?.ctxOptions)
         this.mainGain = this.ctx.createGain()
         if(options?.defaultMainGainValue){
@@ -23,16 +22,6 @@ export default class Mixer extends EventTarget {
             this.dynamicCompressor = undefined
             this.mainGain.connect(this.ctx.destination)
         }
-    }
-    //TODO:finish event system
-    addEventListener(type: "play" | "pause", listener: EventListener | EventListenerObject | null, options?: boolean | AddEventListenerOptions | undefined): void {
-        super.addEventListener(type, listener, options)
-    }
-    dispatchEvent(event: Event): boolean {
-        return super.dispatchEvent(event)
-    }
-    removeEventListener(type: string, callback: EventListener | EventListenerObject | null, options?: boolean | EventListenerOptions | undefined): void {
-        super.removeEventListener(type, callback, options)
     }
     ctx: AudioContext
     /**
@@ -122,7 +111,6 @@ export default class Mixer extends EventTarget {
     addSource(id: string, node: AudioSource,autoConnect:boolean=false) {
         if(autoConnect)this.connectToLast(node)
         this._sourcesMap.set(id, node)
-        node.on('ended', () => { this._sourcesMap.delete(id) }) //自毁，毕竟播完就没用了
         return this
     }
     /**
@@ -160,7 +148,8 @@ export default class Mixer extends EventTarget {
     play(id: string, when?: number, loop?: SourceNodeLoopOptions) {
         let node = this._sourcesMap.get(id)
         if (node) {
-            node.start(when,loop)
+            if(node.state=="stop")node.initSource()
+            node.start({when,loop})
             return true
         } else {
             return false
@@ -177,7 +166,7 @@ export default class Mixer extends EventTarget {
     }
     playAll(loop?: SourceNodeLoopOptions) {
         for (const node of this._sourcesMap.values()) {
-            node.start(0,loop)
+            node.start({loop})
 
         }
         return this
@@ -191,12 +180,8 @@ export default class Mixer extends EventTarget {
     getGainOf(id:string){
         return this._sourcesMap.get(id)?.gain
     }
-    private _initPlayEvent(){
-        this.dispatchEvent(new Event('play',{bubbles:true}))
-    }
-
 }
-export interface MixerOptions {
+export interface MixerProps {
     defaultMainGainValue?:number
     ctxOptions?: AudioContextOptions | undefined
     dynamicCompressorOptions?: DynamicsCompressorOptions | undefined
